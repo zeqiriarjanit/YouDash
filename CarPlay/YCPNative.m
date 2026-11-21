@@ -387,6 +387,10 @@ static id YCPReadObject(id object, NSString *name) {
             phone.rootViewController = placeholder;
             [self.host embed:phoneRoot];
             [destination makeKeyAndVisible];
+            // Trait overrides propagate lazily. Apply them now so the native tree
+            // reads the tablet idiom before its first car layout, not after.
+            [self.host updateTraitsIfNeeded];
+            [phoneRoot updateTraitsIfNeeded];
             if (YCPIsCarRole(phone.windowScene.session.role) && phone != destination) phone.hidden = YES;
             [self.retryTimer invalidate]; self.retryTimer = nil;
             YCPLog(@"Transferred initialized native root: %@ navigationDepth=%lu car=%@", NSStringFromClass(phoneRoot.class), (unsigned long)stack.count, NSStringFromCGRect(destination.bounds));
