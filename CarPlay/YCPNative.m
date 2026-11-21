@@ -405,11 +405,39 @@ static id YCPReadObject(id object, NSString *name) {
 }
 @end
 
+// Diagnostics only (issue #3): records which path, if any, delivers a drawable
+// car window. Nothing here changes routing or window ownership.
+static NSString *YCPDescribeWindow(UIWindow *window) {
+    if (!window) return @"nil";
+    return [NSString stringWithFormat:@"%@ bounds=%@ screen=%@ hidden=%d root=%@", NSStringFromClass(window.class),
+            NSStringFromCGRect(window.bounds), window.screen ? NSStringFromCGRect(window.screen.bounds) : @"nil",
+            window.hidden, NSStringFromClass(window.rootViewController.class)];
+}
+
+static void YCPLogCarDiagnostics(NSString *path, CPTemplateApplicationScene *scene, CPWindow *window) {
+    YCPLog(@"Diagnostics: path=%@ OS=%@ callbackWindow=%@", path, UIDevice.currentDevice.systemVersion, YCPDescribeWindow(window));
+    YCPLog(@"Diagnostics: scene.carWindow=%@", YCPDescribeWindow(scene.carWindow));
+    if (@available(iOS 26.4, *)) {
+        static CPSessionConfiguration *session;
+        static id<CPSessionConfigurationDelegate> sessionDelegate;
+        if (!session) {
+            sessionDelegate = (id<CPSessionConfigurationDelegate>)[NSObject new];
+            session = [[CPSessionConfiguration alloc] initWithDelegate:sessionDelegate];
+        }
+        YCPLog(@"Diagnostics: supportsVideoPlayback=%d limitedUI=%lu", session.supportsVideoPlayback, (unsigned long)session.limitedUserInterfaces);
+    }
+    for (UIScene *connected in UIApplication.sharedApplication.connectedScenes)
+        YCPLog(@"Diagnostics: connected scene role=%@ class=%@ state=%ld", connected.session.role,
+               NSStringFromClass(connected.class), (long)connected.activationState);
+}
+
 @implementation YCPTemplateDelegate
 - (void)templateApplicationScene:(CPTemplateApplicationScene *)scene didConnectInterfaceController:(CPInterfaceController *)controller toWindow:(CPWindow *)window {
+    YCPLogCarDiagnostics(@"toWindow", scene, window);
     [YCPSurface.shared connectTemplate:controller window:window];
 }
 - (void)templateApplicationScene:(CPTemplateApplicationScene *)scene didConnectInterfaceController:(CPInterfaceController *)controller {
+    YCPLogCarDiagnostics(@"noWindow", scene, nil);
     [YCPSurface.shared connectTemplate:controller window:nil];
 }
 - (void)templateApplicationScene:(CPTemplateApplicationScene *)scene didDisconnectInterfaceController:(CPInterfaceController *)controller fromWindow:(CPWindow *)window {

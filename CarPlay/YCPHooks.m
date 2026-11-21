@@ -102,6 +102,7 @@ static void YCPInspectNativeRoot(UIViewController *root) {
 
 static UISceneConfiguration *YCPSceneConfiguration(id object, SEL selector, UIApplication *application,
                                                   UISceneSession *session, UISceneConnectionOptions *options) {
+    YCPLog(@"Diagnostics: scene requested role=%@ car=%d", session.role, YCPIsCarRole(session.role));
     if (YCPIsCarRole(session.role)) {
         UISceneConfiguration *configuration = [[UISceneConfiguration alloc] initWithName:@"YouTube CarPlay" sessionRole:session.role];
         BOOL isTemplate = [session.role isEqualToString:CPTemplateApplicationSceneSessionRoleApplication];
