@@ -28,6 +28,10 @@ with tempfile.TemporaryDirectory(prefix="youmod-surface-test-") as temp:
         "CFBundleName": "SurfaceTests", "CFBundlePackageType": "APPL", "CFBundleVersion": "1",
         "CFBundleShortVersionString": "1", "MinimumOSVersion": "17.0",
         "UIDeviceFamily": [1], "UILaunchScreen": {},
+        # iOS 27 requires UIScene lifecycle adoption; the harness drives windows directly.
+        "UIApplicationSceneManifest": {"UIApplicationSupportsMultipleScenes": False, "UISceneConfigurations": {
+            "UIWindowSceneSessionRoleApplication": [{"UISceneConfigurationName": "Harness",
+                "UISceneClassName": "UIWindowScene", "UISceneDelegateClassName": "HarnessSceneDelegate"}]}},
     }))
     run("codesign", "--force", "--sign", "-", app)
     run("xcrun", "simctl", "install", sys.argv[1], app)

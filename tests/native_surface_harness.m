@@ -26,6 +26,13 @@
 
 void YCPBootstrapNativeScene(UIWindowScene *scene, UISceneSession *session, UISceneConnectionOptions *options) {}
 
+// iOS 27 terminates apps that do not adopt the UIScene lifecycle. The checks
+// below drive windows directly, so the declared scene only satisfies UIKit.
+@interface HarnessSceneDelegate : UIResponder <UIWindowSceneDelegate>
+@property(nonatomic, strong) UIWindow *window;
+@end
+@implementation HarnessSceneDelegate @end
+
 @interface HarnessDelegate : UIResponder <UIApplicationDelegate>
 @property(nonatomic, strong) UIWindow *mainWindow;
 @end

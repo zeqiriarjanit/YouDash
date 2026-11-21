@@ -115,6 +115,13 @@ static UIWindow *TestCarWindow;
 }
 @end
 
+// iOS 27 terminates apps that do not adopt the UIScene lifecycle. The checks
+// below drive windows directly, so the declared scene only satisfies UIKit.
+@interface HarnessSceneDelegate : UIResponder <UIWindowSceneDelegate>
+@property(nonatomic, strong) UIWindow *window;
+@end
+@implementation HarnessSceneDelegate @end
+
 @interface TestApp : UIResponder <UIApplicationDelegate>
 @property(nonatomic, strong) UIWindow *window;
 @end
